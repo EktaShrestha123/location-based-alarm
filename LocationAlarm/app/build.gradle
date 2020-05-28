@@ -1,0 +1,147 @@
+apply plugin: 'com.android.application'
+// Firebase performance monitoring plugin.
+apply plugin: 'com.google.firebase.firebase-perf'
+// For Crashlytics
+apply plugin: 'io.fabric'
+
+android {
+    compileSdkVersion 28
+    buildToolsVersion '28.0.3'
+    defaultConfig {
+        applicationId 'app.tasknearby.yashcreations.com.tasknearby'
+        minSdkVersion 17
+        targetSdkVersion 28
+        versionCode 18
+        versionName "4.0.5"
+        vectorDrawables {
+            useSupportLibrary true
+        }
+    }
+    buildTypes {
+        debug {
+            // to allow debug and release both to be installed on device.
+            // also, a different icon will be set for debug (see project structure).
+            applicationIdSuffix '.debug'
+        }
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    productFlavors {}
+    // For Java 8 compatibility.
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+}
+
+def supportLibVersion = "28.0.0"
+def playServicesVersion = "16.0.0"
+def firebaseCoreVersion = "16.0.6"
+def firebasePerfVersion = "16.2.2"
+def firebaseMessagingVersion = "17.3.4"
+def jodaTimeVersion = "2.9.9.1"
+def picassoVersion = "2.5.2"
+def billingLibVersion = "1.0"
+def crashlyticsVersion = "2.9.7"
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'androidx.gridlayout:gridlayout:1.0.0'
+    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+
+    implementation "com.google.android.gms:play-services-location:$playServicesVersion"
+    implementation "com.google.android.gms:play-services-maps:$playServicesVersion"
+    implementation "com.google.android.gms:play-services-places:$playServicesVersion"
+
+    implementation "com.google.firebase:firebase-core:$firebaseCoreVersion"
+    implementation "com.google.firebase:firebase-perf:$firebasePerfVersion"
+    implementation "com.google.firebase:firebase-messaging:$firebaseMessagingVersion"
+
+    implementation "com.crashlytics.sdk.android:crashlytics:$crashlyticsVersion"
+
+    // Room
+    implementation 'androidx.room:room-runtime:2.0.0'
+
+    annotationProcessor 'androidx.room:room-compiler:2.0.0'
+
+    // LiveData and ViewModel
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
+    // Default
+//    annotationProcessor "android.arch.lifecycle:compiler:$archRoomVersion"
+    // Recommended with Java 8
+    implementation 'androidx.lifecycle:lifecycle-common-java8:2.0.0'
+
+    // Joda-time
+    implementation "net.danlew:android.joda:$jodaTimeVersion"
+
+    // Annotations
+    implementation 'androidx.annotation:annotation:1.0.1'
+
+    implementation "com.squareup.picasso:picasso:$picassoVersion"
+
+    implementation "com.android.billingclient:billing:$billingLibVersion"
+
+    dependencies {
+        implementation 'com.github.TouchBoarder:weekdays-buttons-bar:v1.0.2'
+    }
+}
+
+// this has to be kept after the dependency block to avoid dependency collisions.
+apply plugin: 'com.google.gms.google-services'
+
+/**
+ * Code quality checks.
+ */
+apply plugin: 'findbugs'
+apply plugin: 'checkstyle'
+
+// Performs checkstyle checks.
+// https://tinyurl.com/ybf2p648
+task checkstyleCheck(type: Checkstyle) {
+    configFile file("${project.rootDir}/config/checkstyle/checkstyle.xml")
+    classpath = files()
+    source 'src/main'
+    include '**/*.java'
+    exclude '**/gen/**'
+    // to fail the build when checkstyle is not passed.
+    ignoreFailures true
+    showViolations true
+}
+
+/**
+ * Read more about findbugs in android project from these links:
+ * https://stackoverflow.com/a/30068813/4857588
+ * https://docs.gradle.org/current/dsl/org.gradle.api.plugins.quality.FindBugs.html
+ */
+task customFindbugs(type: FindBugs, dependsOn: assemble) {
+    ignoreFailures true
+    effort "default"
+    reportLevel "medium"
+    excludeFilter = new File("${project.rootDir}/config/findbugs/findbugs-exclude-filter.xml")
+    classes = files("${project.projectDir}/build/intermediates/classes")
+    source = fileTree("src/main/java/")
+    classpath = files()
+    reports {
+        xml.enabled false
+        html.enabled true
+        html {
+            setDestination(new File("${project.buildDir}/findbugs/findbugs-output.html"))
+        }
+    }
+}
+
+check.dependsOn checkstyleCheck
+check.dependsOn customFindbugs
+customFindbugs.shouldRunAfter checkstyleCheck // because checkstyle runs faster.
+

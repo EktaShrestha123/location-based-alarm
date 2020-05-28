@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="app.locationalarm.ekta.com.alarmlocation">
+
+    <!-- Permissions -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
+    <!-- Required for getting image -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Billing permission -->
+    <uses-permission android:name="com.android.vending.BILLING" />
+    <!-- Foreground Service permission for Android 9+ -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <!--
+     Google play services adds the READ_PHONE_STATE permission by default for InstanceId generation
+     on older devices. This might not be needed. However, please confirm this by testing.
+     If READ_PHONE_STATE permission is present, then we need to provide a privacy policy.
+    -->
+    <uses-permission xmlns:tools="http://schemas.android.com/tools"
+        android:name="android.permission.READ_PHONE_STATE"
+        tools:node="remove" />
+
+    <!-- To stop from being distributed on non-GPS enabled devices. -->
+    <uses-feature android:name="android.hardware.location.gps" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity
+            android:name="app.locationalarm.ekta.com.alarmlocation.MainActivity"
+            android:label="@string/app_name"
+            android:theme="@style/TranslucentTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="app.locationalarm.ekta.com.alarmlocation.SettingsActivity"
+            android:label="@string/title_settings"
+            android:parentActivityName="app.locationalarm.ekta.com.alarmlocation.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name="app.locationalarm.ekta.com.alarmlocation.DetailActivity"
+            android:label="Task Detail"
+            android:parentActivityName="app.locationalarm.ekta.com.alarmlocation.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name="app.locationalarm.ekta.com.alarmlocation.AlarmActivity"
+            android:excludeFromRecents="true"
+            android:exported="true"
+            android:label="Alarm"
+            android:launchMode="singleInstance"
+            android:parentActivityName="app.locationalarm.ekta.com.alarmlocation.MainActivity"
+            android:showOnLockScreen="true"
+            android:showWhenLocked="true"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:turnScreenOn="true" />
+        <activity
+            android:name="app.locationalarm.ekta.com.alarmlocation.SavedPlacesActivity"
+            android:exported="true"
+            android:label="@string/title_saved_places"
+            android:parentActivityName="app.locationalarm.ekta.com.alarmlocation.TaskCreatorActivity"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name="app.locationalarm.ekta.com.alarmlocation.ShowImageActivity"
+            android:label="Task Image" />
+        <activity
+            android:name="app.locationalarm.ekta.com.alarmlocation.AboutActivity"
+            android:parentActivityName="app.locationalarm.ekta.com.alarmlocation.MainActivity"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name="app.locationalarm.ekta.com.alarmlocation.UpgradeActivity"
+            android:exported="true"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name="app.locationalarm.ekta.com.alarmlocation.OnboardingActivity"
+            android:exported="true"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name="app.locationalarm.ekta.com.alarmlocation.TaskCreatorActivity"
+            android:exported="true"
+            android:label="@string/title_add_new_task"
+            android:parentActivityName="app.locationalarm.ekta.com.alarmlocation.MainActivity"
+            android:theme="@style/AppTheme"/>
+
+        <service
+            android:name="app.locationalarm.ekta.com.alarmlocation.services.ActivityDetectionService"
+            android:enabled="true"
+            android:stopWithTask="false" />
+        <service
+            android:name="app.locationalarm.ekta.com.alarmlocation.services.FusedLocationService"
+            android:enabled="true"
+            android:stopWithTask="false" />
+
+        <receiver
+            android:name="app.locationalarm.ekta.com.alarmlocation.MainActivity$BootCompletedReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name="app.locationalarm.ekta.com.alarmlocation.notification.NotificationClickHandler" />
+
+        <!-- FCM services.. -->
+        <service android:name="app.locationalarm.ekta.com.alarmlocation.fcm.MyFirebaseMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        <service android:name="app.locationalarm.ekta.com.alarmlocation.fcm.MyFirebaseInstanceIDService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
+            </intent-filter>
+        </service>
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="place" />
+
+    </application>
+
+</manifest>
